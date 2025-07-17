@@ -27,6 +27,20 @@ const ProductCard = ({ product, onAddToCart, isAdmin, onDeleteProduct, onEditPro
     return stars;
   };
 
+  // Logika yang lebih robust untuk menentukan imageUrl
+  let imageUrl = 'https://placehold.co/400x300/333333/FFFFFF?text=No+Image'; // Default placeholder
+
+  if (product.images && product.images.length > 0 && product.images[0]) {
+    const firstImage = product.images[0];
+    // Cek apakah URL dimulai dengan http atau https (URL lengkap)
+    if (firstImage.startsWith('http://') || firstImage.startsWith('https://')) {
+      imageUrl = firstImage; // Jika URL lengkap, gunakan langsung
+    } else {
+      // Jika bukan URL lengkap, asumsikan itu adalah nama file di public/image/
+      imageUrl = `/image/${firstImage.split('/').pop()}`;
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
@@ -34,10 +48,9 @@ const ProductCard = ({ product, onAddToCart, isAdmin, onDeleteProduct, onEditPro
       transition={{ type: 'spring', stiffness: 100, damping: 10 }}
       className="bg-primary-light rounded-lg shadow-lg overflow-hidden flex flex-col h-full border border-border-light"
     >
-      {/* Meningkatkan tinggi gambar untuk mobile dan desktop lebih lanjut */}
       <div className="relative w-full h-72 sm:h-80 flex-shrink-0 overflow-hidden">
         <img
-          src={product.images && product.images[0] ? product.images[0] : 'https://placehold.co/400x300/333333/FFFFFF?text=No+Image'}
+          src={imageUrl} // Menggunakan imageUrl yang sudah diperbaiki logikanya
           alt={product.name}
           className="w-full h-full object-cover"
           onError={(e) => {

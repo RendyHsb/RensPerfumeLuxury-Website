@@ -4,27 +4,60 @@ import { motion } from 'motion/react';
 const AboutPage = () => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -50 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen bg-primary-light text-text-dark py-8 px-4"
+      className="container mx-auto px-4 py-8 sm:px-6 lg:px-8 pt-28 sm:pt-32"
     >
-      <div className="container mx-auto max-w-3xl bg-secondary-dark p-6 sm:p-8 rounded-lg shadow-xl border border-border-dark">
-        <h2 className="text-4xl sm:text-5xl font-playfair text-accent-gold text-center mb-6 sm:mb-8 relative">
-          Tentang RensPerfumeLuxury
-          <span className="block w-20 sm:w-24 h-1 bg-accent-gold mx-auto mt-2 sm:mt-4 rounded-full"></span>
-        </h2>
-        <p className="font-inter text-base sm:text-lg leading-relaxed mb-4 sm:mb-6 text-primary-light">
-          Selamat datang di RensPerfumeLuxury, destinasi utama Anda untuk parfum high-end yang memukau dan tak terlupakan. Kami percaya bahwa setiap aroma adalah sebuah cerita, sebuah ekspresi pribadi, dan sebuah karya seni. Oleh karena itu, kami mendedikasikan diri untuk menghadirkan koleksi parfum pilihan dari merek-merek paling eksklusif di dunia.
+      <h1 className="text-3xl sm:text-4xl md:text-5xl font-playfair text-primary-dark mb-6 text-center">
+        Tentang RensPerfumeLuxury
+      </h1>
+      <p className="text-lg text-text-dark mb-8 text-center max-w-3xl mx-auto">
+        Selamat datang di RensPerfumeLuxury, destinasi utama Anda untuk parfum high-end yang memukau dan tak terlupakan.
+        Kami percaya bahwa setiap aroma adalah sebuah cerita, sebuah ekspresi pribadi, dan sebuah karya seni. Oleh karena itu, kami mendedikasikan diri untuk menghadirkan koleksi parfum pilihan dari merek-merek paling eksklusif di dunia.
+      </p>
+      {}
+      {}
+      <motion.div
+        initial={{ opacity: 0, x: -50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="text-center md:text-left max-w-3xl mx-auto" 
+      >
+        <h2 className="text-2xl sm:text-3xl font-semibold text-primary-dark mb-4">Filosofi Kami</h2>
+        <p className="text-text-dark mb-4">
+          Di RensPerfumeLuxury, kami tidak hanya menjual parfum; kami menawarkan pengalaman. Setiap botol yang kami kurasi adalah perwujudan dari keanggunan, kualitas, dan keunikan. Kami berkomitmen untuk menyediakan produk otentik dan layanan pelanggan yang tak tertandingi, memastikan setiap interaksi Anda dengan kami seindah aroma yang Anda pilih.
         </p>
-        <p className="font-inter text-base sm:text-lg leading-relaxed mb-4 sm:mb-6 text-primary-light">
-          Didirikan dengan hasrat untuk keharuman yang luar biasa dan komitmen terhadap kualitas tanpa kompromi, RensPerfumeLuxury adalah perwujudan dari kemewahan dan keanggunan. Setiap botol yang kami tawarkan telah melalui kurasi ketat untuk memastikan Anda mendapatkan pengalaman olfaktori yang tiada duanya.
+        <p className="text-text-dark">
+          Kami percaya bahwa parfum adalah bentuk seni yang paling intim, sebuah sentuhan akhir yang melengkapi kepribadian Anda. Biarkan kami membantu Anda menemukan aroma khas yang akan meninggalkan kesan abadi.
         </p>
-        <p className="font-inter text-base sm:text-lg leading-relaxed text-primary-light">
-          Misi kami adalah membantu Anda menemukan aroma khas yang paling sesuai dengan kepribadian dan gaya hidup Anda, meningkatkan setiap momen dengan sentuhan kemewahan. Jelajahi koleksi kami dan biarkan kami membimbing Anda dalam perjalanan menuju keharuman yang sempurna.
+      </motion.div>
+
+      {}
+      {/* <motion.div
+        initial={{ opacity: 0, x: 50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="order-1 md:order-2 flex justify-center"
+      >
+        <img
+          src="https://placehold.co/500x350/E0BBE4/FFFFFF?text=Luxury+Perfume"
+          alt="Luxury Perfume Bottle"
+          className="rounded-lg shadow-xl max-w-full h-auto"
+        />
+      </motion.div> */}
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+        className="mt-12 text-center"
+      >
+        <h2 className="text-2xl sm:text-3xl font-semibold text-primary-dark mb-4">Visi Kami</h2>
+        <p className="text-text-dark max-w-2xl mx-auto">
+          Menjadi destinasi terdepan untuk parfum mewah, menyediakan koleksi yang tak tertandingi dan pengalaman berbelanja yang personal bagi para pecinta aroma di seluruh dunia.
         </p>
-      </div>
+      </motion.div>
     </motion.div>
   );
 };

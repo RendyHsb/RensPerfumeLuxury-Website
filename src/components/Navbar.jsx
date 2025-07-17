@@ -29,11 +29,12 @@ const Navbar = ({ onNavigate, cartItemCount, currentUser, onLogout, selectedCate
     }
   };
 
+  // Varian animasi untuk menu mobile (slide dari kanan)
   const menuVariants = {
-    hidden: { opacity: 0, x: "100%" },
+    hidden: { opacity: 0, x: "100%" }, // Mulai dari luar layar kanan
     visible: {
       opacity: 1,
-      x: "0%",
+      x: "0%", // Geser ke dalam layar
       transition: {
         type: "spring",
         stiffness: 120,
@@ -44,7 +45,7 @@ const Navbar = ({ onNavigate, cartItemCount, currentUser, onLogout, selectedCate
     },
     exit: {
       opacity: 0,
-      x: "100%",
+      x: "100%", // Geser kembali ke luar layar kanan
       transition: {
         type: "spring",
         stiffness: 120,
@@ -55,6 +56,7 @@ const Navbar = ({ onNavigate, cartItemCount, currentUser, onLogout, selectedCate
     }
   };
 
+  // Varian animasi untuk setiap item di dalam menu mobile
   const menuItemVariants = {
     hidden: { y: 20, opacity: 0 },
     visible: { y: 0, opacity: 1 },
@@ -70,8 +72,6 @@ const Navbar = ({ onNavigate, cartItemCount, currentUser, onLogout, selectedCate
     >
       <div className="container mx-auto px-4 py-4 flex flex-row justify-between items-center">
         {/* Brand Name with Scrolling Text Animation */}
-        {/* Menggunakan min-w-0 dan flex-grow untuk memastikan teks selalu terlihat dan mengambil ruang yang dibutuhkan */}
-        {/* Menyesuaikan ukuran font lebih kecil lagi di mobile (text-base) untuk memastikan tidak kepotong */}
         <div
           className="text-base sm:text-3xl md:text-4xl font-playfair text-accent-gold cursor-pointer relative overflow-hidden flex items-center justify-start flex-grow min-w-0"
           style={{ height: '55px' }}
@@ -90,6 +90,7 @@ const Navbar = ({ onNavigate, cartItemCount, currentUser, onLogout, selectedCate
 
         <div className="flex items-center space-x-4">
 
+          {/* Hamburger Icon & Mobile User/Cart (Hanya terlihat di mobile) */}
           <div className="flex sm:hidden items-center space-x-4">
             <CartIcon itemCount={cartItemCount} onClick={() => onNavigate('cart')} />
             {currentUser ? (
@@ -146,6 +147,7 @@ const Navbar = ({ onNavigate, cartItemCount, currentUser, onLogout, selectedCate
             </button>
           </div>
 
+          {/* Desktop Nav Links & Desktop User/Cart (Hanya terlihat di desktop) */}
           <div className="hidden sm:flex items-center space-x-4 sm:space-x-6 text-sm sm:text-base">
             <motion.button
               whileHover={{ scale: 1.1 }}
@@ -226,41 +228,64 @@ const Navbar = ({ onNavigate, cartItemCount, currentUser, onLogout, selectedCate
       {/* Mobile Overlay Menu */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div
-            className="absolute top-full left-0 w-full bg-primary-dark py-4 shadow-lg flex flex-col items-center space-y-4 sm:hidden"
-            variants={menuVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-          >
-            <motion.button
-              variants={menuItemVariants}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => { onNavigate('home', '', 'info', 'all'); setIsMenuOpen(false); }}
-              className="text-primary-light hover:text-accent-gold transition-colors duration-200 text-lg font-semibold"
+          <>
+            {/* Overlay background */}
+            <motion.div
+              className="fixed inset-0 bg-black bg-opacity-50 z-40 sm:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMenuOpen(false)} // Tutup menu saat klik di luar
+            />
+            {/* Menu konten */}
+            <motion.div
+              className="fixed top-0 right-0 h-full w-3/4 bg-primary-dark py-8 px-6 shadow-lg flex flex-col items-start space-y-6 sm:hidden z-50"
+              variants={menuVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
             >
-              Beranda
-            </motion.button>
-            <motion.button
-              variants={menuItemVariants}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => { onNavigate('about'); setIsMenuOpen(false); }}
-              className="text-primary-light hover:text-accent-gold transition-colors duration-200 text-lg font-semibold"
-            >
-              Tentang Kami
-            </motion.button>
-            <motion.button
-              variants={menuItemVariants}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => { onNavigate('contact'); setIsMenuOpen(false); }}
-              className="text-primary-light hover:text-accent-gold transition-colors duration-200 text-lg font-semibold"
-            >
-              Kontak
-            </motion.button>
-          </motion.div>
+              {/* Tombol Tutup (X) */}
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setIsMenuOpen(false)}
+                className="self-end text-primary-light hover:text-accent-gold focus:outline-none mb-4"
+              >
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </motion.button>
+
+              <motion.button
+                variants={menuItemVariants}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => { onNavigate('home', '', 'info', 'all'); setIsMenuOpen(false); }}
+                className="text-primary-light hover:text-accent-gold transition-colors duration-200 text-lg font-semibold w-full text-left"
+              >
+                Beranda
+              </motion.button>
+              <motion.button
+                variants={menuItemVariants}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => { onNavigate('about'); setIsMenuOpen(false); }}
+                className="text-primary-light hover:text-accent-gold transition-colors duration-200 text-lg font-semibold w-full text-left"
+              >
+                Tentang Kami
+              </motion.button>
+              <motion.button
+                variants={menuItemVariants}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => { onNavigate('contact'); setIsMenuOpen(false); }}
+                className="text-primary-light hover:text-accent-gold transition-colors duration-200 text-lg font-semibold w-full text-left"
+              >
+                Kontak
+              </motion.button>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 

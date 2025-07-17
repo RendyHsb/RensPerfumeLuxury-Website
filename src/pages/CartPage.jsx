@@ -4,11 +4,26 @@ import { motion } from 'motion/react';
 const CartPage = ({ cartItems, onUpdateQuantity, onRemoveItem, onNavigate, onCheckout }) => {
   const totalAmount = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
+  // Logika untuk menentukan imageUrl yang robust, sama seperti di ProductCard
+  const getImageUrl = (item) => {
+    let imageUrl = 'https://placehold.co/150x150/E0BBE4/FFFFFF?text=No+Image'; // Default placeholder
+    if (item.images && item.images.length > 0 && item.images[0]) {
+      const firstImage = item.images[0];
+      if (firstImage.startsWith('http://') || firstImage.startsWith('https://')) {
+        imageUrl = firstImage;
+      } else {
+        imageUrl = `/image/${firstImage.split('/').pop()}`;
+      }
+    }
+    return imageUrl;
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
+      // Menambahkan padding-top yang lebih besar untuk mengatasi navbar fixed
       className="container mx-auto px-4 py-8 sm:px-6 lg:px-8 pt-28 sm:pt-32"
     >
       <h1 className="text-3xl sm:text-4xl md:text-5xl font-playfair text-primary-dark mb-6 text-center">
@@ -39,44 +54,51 @@ const CartPage = ({ cartItems, onUpdateQuantity, onRemoveItem, onNavigate, onChe
                 transition={{ duration: 0.3 }}
                 className="flex flex-col sm:flex-row items-center bg-white p-4 rounded-lg shadow-md"
               >
+                {/* Gambar Produk - Memperbesar ukuran dan memastikan object-cover */}
                 <img
-                  src={item.images && item.images[0] ? item.images[0] : `https://placehold.co/100x100/E0BBE4/FFFFFF?text=${item.name.substring(0, 5)}`}
+                  src={getImageUrl(item)} // Menggunakan fungsi getImageUrl yang robust
                   alt={item.name}
-                  className="w-24 h-24 object-cover rounded-md mb-4 sm:mb-0 sm:mr-4"
-                  onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/100x100/E0BBE4/FFFFFF?text=${item.name.substring(0, 5)}`; }}
+                  className="w-32 h-32 sm:w-28 sm:h-28 object-cover rounded-md mb-4 sm:mb-0 sm:mr-4 flex-shrink-0"
+                  onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/150x150/E0BBE4/FFFFFF?text=No+Image`; }}
                 />
+                
+                {/* Detail Produk */}
                 <div className="flex-grow text-center sm:text-left mb-4 sm:mb-0">
                   <h3 className="font-semibold text-lg text-primary-dark">{item.name}</h3>
                   <p className="text-text-dark">Rp {item.price.toLocaleString('id-ID')}</p>
                 </div>
+
+                {/* Kontrol Kuantitas */}
                 <div className="flex items-center space-x-2 mr-4">
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-                    className="bg-secondary-light text-text-dark p-2 rounded-full"
+                    className="bg-secondary-light text-text-dark p-2 rounded-full shadow-sm hover:bg-secondary-light/80 transition-colors duration-200"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12h-15" />
                     </svg>
                   </motion.button>
-                  <span className="text-text-dark text-lg font-medium">{item.quantity}</span>
+                  <span className="text-text-dark text-lg font-medium w-8 text-center">{item.quantity}</span>
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                    className="bg-secondary-light text-text-dark p-2 rounded-full"
+                    className="bg-secondary-light text-text-dark p-2 rounded-full shadow-sm hover:bg-secondary-light/80 transition-colors duration-200"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
                   </motion.button>
                 </div>
+
+                {/* Tombol Hapus */}
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => onRemoveItem(item.id)}
-                  className="text-accent-red hover:text-red-700 p-2 rounded-full"
+                  className="text-accent-red hover:text-red-700 p-2 rounded-full transition-colors duration-200 mt-4 sm:mt-0"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.925a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m-1.022.165L5.79 19.673a2.25 2.25 0 002.244 2.077h8.925a2.25 2.25 0 002.244-2.077L19.508 5.79m-14.65 0a48.108 48.108 0 01-1.023-.167M12 7.5h.008v.008H12V7.5zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
@@ -86,6 +108,7 @@ const CartPage = ({ cartItems, onUpdateQuantity, onRemoveItem, onNavigate, onChe
             ))}
           </div>
 
+          {/* Ringkasan Pesanan */}
           <div className="lg:col-span-1 bg-white p-6 rounded-lg shadow-md h-fit">
             <h2 className="text-2xl font-semibold text-primary-dark mb-4">Ringkasan Pesanan</h2>
             <div className="flex justify-between items-center mb-2">
