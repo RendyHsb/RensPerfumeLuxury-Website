@@ -1,72 +1,62 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 
-const ToastNotification = ({ message, type, onClose }) => {
+const ToastNotification = ({ message, type, duration = 3000, onClose }) => {
+  const [isVisible, setIsVisible] = useState(true);
+
   useEffect(() => {
     if (message) {
+      setIsVisible(true);
       const timer = setTimeout(() => {
-        onClose();
-      }, 5000);
+        setIsVisible(false);
+        if (onClose) {
+          onClose();
+        }
+      }, duration);
       return () => clearTimeout(timer);
     }
-  }, [message, onClose]);
+  }, [message, duration, onClose]);
 
-  let bgColorClass = '';
-  let icon = null;
+  if (!message) return null;
 
-  switch (type) {
-    case 'success':
-      bgColorClass = 'bg-green-600';
-      icon = (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      );
-      break;
-    case 'error':
-      bgColorClass = 'bg-red-600';
-      icon = (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      );
-      break;
-    case 'info':
-    default:
-      bgColorClass = 'bg-blue-600';
-      icon = (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      );
-      break;
+  let bgColor = 'bg-blue-500'; // Info
+  let icon = (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-6 h-6 mr-2">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.65-.047l1.391.202.164.023a.75.75 0 01.152.198.75.75 0 01.034.257l.006.052V19.5a.75.75 0 01-1.5 0v-2.75l-.224-.031a.75.75 0 01-.291-.156L11.25 11.25z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 7.5a3 3 0 116 0 3 3 0 01-6 0z" />
+    </svg>
+  );
+
+  if (type === 'success') {
+    bgColor = 'bg-green-500';
+    icon = (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-6 h-6 mr-2">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    );
+  } else if (type === 'error') {
+    bgColor = 'bg-red-500';
+    icon = (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-6 h-6 mr-2">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    );
   }
 
   return (
     <AnimatePresence>
-      {message && (
+      {isVisible && (
         <motion.div
-          initial={{ opacity: 0, y: 50, scale: 0.8 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -50, scale: 0.8 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-          className={`fixed bottom-4 left-1/2 -translate-x-1/2 p-4 rounded-lg shadow-lg flex items-center space-x-3 z-50 max-w-sm w-full ${bgColorClass} text-white`}
-          role="alert"
+          initial={{ opacity: 0, y: 50, x: "-50%" }} // Mulai dari bawah dan tengah
+          animate={{ opacity: 1, y: 0, x: "-50%" }} // Geser ke atas dan tetap di tengah
+          exit={{ opacity: 0, y: 50, x: "-50%" }} // Geser ke bawah saat hilang
+          transition={{ type: "spring", stiffness: 100, damping: 10 }}
+          // Posisi tetap di bawah tengah layar, responsif untuk mobile
+          className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 ${bgColor} text-white px-4 py-3 rounded-lg shadow-lg flex items-center justify-center z-50
+            max-w-[90vw] sm:max-w-md text-center break-words`} // Menyesuaikan lebar dan memastikan teks tidak terpotong
         >
-          {icon && <div className="flex-shrink-0">{icon}</div>}
-          <div className="flex-grow text-sm font-medium">
-            {message}
-          </div>
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={onClose}
-            className="flex-shrink-0 ml-4 p-1 rounded-full hover:bg-white hover:bg-opacity-20 transition-colors duration-200"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </motion.button>
+          {icon}
+          <span className="font-semibold text-sm sm:text-base">{message}</span>
         </motion.div>
       )}
     </AnimatePresence>
