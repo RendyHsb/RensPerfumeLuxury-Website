@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migrasi Produk ke Firestore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1A1A1A; /* primary-dark */
+            color: #FFFFFF; /* primary-light */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container-migrate {
+            background-color: #2C2C2C; /* secondary-dark */
+            padding: 2.5rem;
+            border-radius: 0.75rem; /* rounded-lg */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #555555; /* border-dark */
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.25rem; /* text-4xl */
+            color: #D4AF37; /* accent-gold */
+            margin-bottom: 1.5rem;
+        }
+        button {
+            background-color: #E00000; /* accent-red */
+            color: #FFFFFF; /* primary-light */
+            font-weight: 600; /* font-semibold */
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem; /* rounded-md */
+            transition: background-color 0.2s ease-in-out;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #C00000; /* slightly darker red */
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #statusMessage {
+            margin-top: 1.5rem;
+            font-size: 1rem;
+        }
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #D4AF37; /* accent-gold */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-migrate">
+        <h1>Migrasi Produk ke Firestore</h1>
+        <p class="mb-6 text-text-muted">Klik tombol di bawah untuk mengunggah data produk awal dari `src/data/products.js` ke Firestore Anda. Ini hanya perlu dilakukan sekali.</p>
+        <button id="migrateButton">
+            <span id="buttonText">Mulai Migrasi</span>
+            <div id="spinner" class="loading-spinner hidden"></div>
+        </button>
+        <p id="statusMessage" class="text-accent-gold"></p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+
+const initialProducts = [
+{
+    id: '1',
+    name: 'Eternal Bloom',
+    price: 350000,
+    description: 'A captivating blend of rare floral essences, evoking timeless elegance and grace. Perfect for sophisticated evenings.',
+    rating: 5,
+    images: [
+    '/public/image/image1.png'
+    ],
+},
+{
+    id: '2',
+    name: 'Midnight Serenade',
+    price: 480000,
+    description: 'Deep, mysterious notes of oud and musk, intertwined with hints of jasmine. An enchanting fragrance for unforgettable nights.',
+    rating: 4,
+    images: [
+    '/public/image/image2.png'
+    ],
+},
+{
+    id: '3',
+    name: 'Golden Hour',
+    price: 280000,
+    description: 'Bright and uplifting, with citrus top notes and a warm amber base. Captures the essence of a perfect sunset.',
+    rating: 5,
+    images: [
+    '/public/image/image3.png'
+    ],
+},
+{
+    id: '4',
+    name: 'Velvet Rose',
+    price: 320000,
+    description: 'A classic, rich rose fragrance with a modern twist, infused with soft vanilla and patchouli. Luxurious and timeless.',
+    rating: 4,
+    images: [
+    '/public/image/image4.png'
+    ],
+},
+{
+    id: '5',
+    name: 'Ocean Whisper',
+    price: 250000,
+    description: 'Crisp and refreshing, reminiscent of a cool ocean breeze with hints of sea salt and driftwood. Invigorating and clean.',
+    rating: 4,
+    images: [
+    '/public/image/image5.png'
+    ],
+},
+{
+    id: '6',
+    name: 'Sandalwood Dream',
+    price: 410000,
+    description: 'Warm and woody, a comforting embrace of creamy sandalwood and soft spices. Perfect for cozy evenings.',
+    rating: 5,
+    images: [
+    '/public/image/image6.png'
+    ],
+},
+{
+    id: '7',
+    name: 'Citrus Burst',
+    price: 290000,
+    description: 'A vibrant explosion of fresh citrus fruits, uplifting and energizing. Ideal for a bright start to your day.',
+    rating: 4,
+    images: [
+    '/public/image/image7.png'
+    ],
+},
+{
+    id: '8',
+    name: 'Mystic Amber',
+    price: 395000,
+    description: 'Rich and resinous amber, infused with exotic vanilla and a touch of smoky incense. A truly captivating aroma.',
+    rating: 5,
+    images: [
+    '/public/image/image8.png'
+    ],
+},
+{
+    id: '9',
+    name: 'Green Tea Oasis',
+    price: 270000,
+    description: 'Light and airy, with crisp green tea notes and delicate white florals. A refreshing escape to a tranquil garden.',
+    rating: 4,
+    images: [
+    '/public/image/image9.png'
+    ],
+},
+{
+    id: '10',
+    name: 'Spiced Vanilla',
+    price: 360000,
+    description: 'Warm and inviting vanilla, complemented by hints of cinnamon, clove, and nutmeg. A cozy and sophisticated gourmand.',
+    rating: 5,
+    images: [
+    '/public/image/image10.png'
+    ],
+},
+];
+        // PASTIKAN Anda mengganti URL gambar di atas dengan URL gambar yang benar
+        // sesuai dengan yang Anda gunakan di src/data/products.js atau dari hosting eksternal.
+        // Jika Anda menggunakan gambar lokal di public/images, pastikan path-nya benar.
+        const migrateButton = document.getElementById('migrateButton');
+        const statusMessage = document.getElementById('statusMessage');
+        const buttonText = document.getElementById('buttonText');
+        const spinner = document.getElementById('spinner');
+
+        // Konfigurasi Firebase Anda (SAMA DENGAN YANG DI App.jsx)
+        const firebaseConfig = {
+            apiKey: "AIzaSyA-qiberjDwwgtfP-IuybBJp81uvL-VRT0",
+            authDomain: "rensperfumeluxury-web.firebaseapp.com",
+            projectId: "rensperfumeluxury-web",
+            storageBucket: "rensperfumeluxury-web.firebasestorage.app",
+            messagingSenderId: "616923399377",
+            appId: "1:616923399377:web:0ce7e96f85792212e431f0",
+            measurementId: "G-7VBJSQEMQ0"
+        };
+
+        let app, db, auth;
+        let appId = 'default-app-id'; // Default, akan di-override jika __app_id ada
+
+        // Inisialisasi Firebase
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            // Coba dapatkan __app_id dari lingkungan Canvas jika tersedia
+            if (typeof __app_id !== 'undefined' && __app_id) {
+                appId = __app_id;
+            }
+
+            // Sign in secara anonim untuk mendapatkan otentikasi agar bisa menulis ke Firestore
+            signInAnonymously(auth)
+                .then(() => {
+                    statusMessage.textContent = "Siap untuk migrasi. Pastikan Anda sudah mengaktifkan Anonymous Auth di Firebase.";
+                    console.log("Signed in anonymously for migration script.");
+                })
+                .catch((error) => {
+                    console.error("Error signing in anonymously:", error);
+                    statusMessage.textContent = `Error: Gagal masuk anonim. Pastikan Anonymous Auth diaktifkan di Firebase. (${error.message})`;
+                    migrateButton.disabled = true;
+                });
+
+        } catch (error) {
+            console.error("Error initializing Firebase:", error);
+            statusMessage.textContent = `Error inisialisasi Firebase: ${error.message}`;
+            migrateButton.disabled = true;
+        }
+
+        migrateButton.addEventListener('click', async () => {
+            if (!db || !auth || !auth.currentUser) {
+                statusMessage.textContent = "Error: Firebase belum terinisialisasi atau belum login anonim.";
+                return;
+            }
+
+            migrateButton.disabled = true;
+            buttonText.textContent = "Mengunggah...";
+            spinner.classList.remove('hidden');
+            statusMessage.textContent = "Memulai migrasi...";
+
+            try {
+                const productsCollectionRef = collection(db, `artifacts/${appId}/public/data/products`);
+                let successCount = 0;
+                let errorCount = 0;
+
+                for (const product of initialProducts) {
+                    try {
+                        const productDocRef = doc(productsCollectionRef, product.id); // Gunakan product.id sebagai ID dokumen
+                        await setDoc(productDocRef, product);
+                        console.log(`Produk '${product.name}' berhasil diunggah.`);
+                        successCount++;
+                    } catch (productError) {
+                        console.error(`Gagal mengunggah produk '${product.name}':`, productError);
+                        statusMessage.textContent = `Error: Gagal mengunggah '${product.name}'. Cek konsol.`;
+                        errorCount++;
+                    }
+                }
+                statusMessage.textContent = `Migrasi selesai! Berhasil: ${successCount}, Gagal: ${errorCount}.`;
+                if (errorCount > 0) {
+                    statusMessage.style.color = '#E00000'; // accent-red
+                } else {
+                    statusMessage.style.color = '#34D399'; // Tailwind green-500 for success
+                }
+
+            } catch (error) {
+                console.error("Error during migration:", error);
+                statusMessage.textContent = `Migrasi gagal total: ${error.message}`;
+                statusMessage.style.color = '#E00000'; // accent-red
+            } finally {
+                migrateButton.disabled = false;
+                buttonText.textContent = "Mulai Migrasi (Selesai)";
+                spinner.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
