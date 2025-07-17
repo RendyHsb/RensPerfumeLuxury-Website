@@ -71,8 +71,9 @@ const Navbar = ({ onNavigate, cartItemCount, currentUser, onLogout, selectedCate
       <div className="container mx-auto px-4 py-4 flex flex-row justify-between items-center">
         {/* Brand Name with Scrolling Text Animation */}
         {/* Menggunakan min-w-0 dan flex-grow untuk memastikan teks selalu terlihat dan mengambil ruang yang dibutuhkan */}
+        {/* Menyesuaikan ukuran font lebih kecil lagi di mobile (text-base) untuk memastikan tidak kepotong */}
         <div
-          className="text-xl sm:text-3xl md:text-4xl font-playfair text-accent-gold cursor-pointer relative overflow-hidden flex items-center justify-start flex-grow min-w-0"
+          className="text-base sm:text-3xl md:text-4xl font-playfair text-accent-gold cursor-pointer relative overflow-hidden flex items-center justify-start flex-grow min-w-0"
           style={{ height: '55px' }}
           onClick={() => onNavigate('home', '', 'info', 'all')}
         >
