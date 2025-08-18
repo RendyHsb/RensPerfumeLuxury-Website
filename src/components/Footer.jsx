@@ -13,7 +13,7 @@ const Footer = ({ onNavigate }) => {
         {/* Pastikan div ini juga memiliki text-center untuk teks di dalamnya */}
         <div className="mb-4 sm:mb-0 text-center">
           <h3 className="text-2xl font-playfair text-accent-gold mb-2">RensPerfumeLuxury</h3>
-          <p className="text-sm text-text-muted">&copy; 2025-2030 Semua Hak Dilindungi.</p>
+          <p className="text-sm text-text-muted">&copy; 2025 Semua Hak Dilindungi.</p>
         </div>
 
         {/* Pastikan div ini memiliki justify-center agar tombol-tombolnya di tengah, baik dalam flex-col maupun flex-row */}
